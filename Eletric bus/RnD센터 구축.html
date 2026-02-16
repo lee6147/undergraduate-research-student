@@ -1,0 +1,959 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>R&D 센터 구축 방안</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap');
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --green: #22c55e;
+            --green-dark: #15803d;
+            --blue: #3b82f6;
+            --cyan: #06b6d4;
+            --yellow: #eab308;
+            --orange: #f97316;
+            --red: #ef4444;
+            --purple: #8b5cf6;
+            --bg: #060b18;
+            --bg2: #0d1525;
+            --card: #131e33;
+            --card2: #182540;
+            --border: #1e3a5f;
+            --text: #f1f5f9;
+            --sub: #94a3b8;
+            --glow-cyan: rgba(6,182,212,0.15);
+            --glow-green: rgba(34,197,94,0.12);
+        }
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            overflow-x: hidden;
+            font-size: 18px;
+            line-height: 1.9;
+        }
+        a { color: inherit; text-decoration: none; }
+        ::selection { background: rgba(6,182,212,0.3); }
+
+        /* ===== NAV ===== */
+        .nav {
+            position: fixed; top: 0; left: 0; right: 0; z-index: 999;
+            background: rgba(6,11,24,0.92);
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(6,182,212,0.08);
+            padding: 0 2.5rem;
+            display: flex; align-items: center; justify-content: space-between;
+            height: 60px;
+            transform: translateY(-100%);
+            transition: transform 0.4s cubic-bezier(0.16,1,0.3,1);
+        }
+        .nav.show { transform: translateY(0); }
+        .nav-logo { font-weight: 900; font-size: 1.05rem; color: var(--cyan); letter-spacing: 2px; }
+        .nav-links { display: flex; gap: 2.2rem; list-style: none; }
+        .nav-links a {
+            color: var(--sub); font-size: 0.95rem; font-weight: 500;
+            transition: color 0.3s; position: relative; padding-bottom: 2px;
+        }
+        .nav-links a:hover { color: var(--cyan); }
+        .nav-links a::after {
+            content: ''; position: absolute; bottom: -2px; left: 0; right: 0;
+            height: 2px; background: var(--cyan); transform: scaleX(0);
+            transition: transform 0.3s; border-radius: 2px;
+        }
+        .nav-links a:hover::after { transform: scaleX(1); }
+
+        /* ===== PROGRESS ===== */
+        .progress {
+            position: fixed; top: 0; left: 0; height: 3px; z-index: 9999; width: 0%;
+            background: linear-gradient(90deg, var(--green), var(--cyan), var(--blue), var(--purple));
+            box-shadow: 0 0 12px var(--cyan);
+        }
+
+        /* ===== HERO ===== */
+        .hero {
+            min-height: 100vh;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            text-align: center; position: relative; overflow: hidden;
+            background: radial-gradient(ellipse at 25% 75%, rgba(6,182,212,0.07) 0%, transparent 55%),
+                        radial-gradient(ellipse at 75% 25%, rgba(34,197,94,0.05) 0%, transparent 55%),
+                        radial-gradient(ellipse at 50% 50%, rgba(139,92,246,0.03) 0%, transparent 60%),
+                        var(--bg);
+        }
+        .hero-grid {
+            position: absolute; inset: 0;
+            background-image:
+                linear-gradient(rgba(6,182,212,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(6,182,212,0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            animation: gridPulse 6s ease-in-out infinite;
+        }
+        @keyframes gridPulse { 0%,100%{opacity:0.3} 50%{opacity:0.8} }
+        .particles { position: absolute; inset: 0; overflow: hidden; }
+        .particle {
+            position: absolute; border-radius: 50%; opacity: 0;
+            animation: pFloat 7s infinite;
+        }
+        @keyframes pFloat {
+            0% { opacity:0; transform:translateY(100vh) scale(0); }
+            15% { opacity:0.6; }
+            85% { opacity:0.1; }
+            100% { opacity:0; transform:translateY(-15vh) scale(1.2); }
+        }
+        .hero-orb {
+            position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.12;
+            animation: orbFloat 10s ease-in-out infinite alternate;
+        }
+        @keyframes orbFloat { 0%{transform:translate(0,0)} 100%{transform:translate(30px,-40px)} }
+        .hero-content { z-index: 2; padding: 2.5rem; max-width: 850px; }
+        .hero-tag {
+            display: inline-block;
+            background: rgba(6,182,212,0.1); border: 1px solid rgba(6,182,212,0.2);
+            color: var(--cyan); font-weight: 700; font-size: 1rem;
+            padding: 0.6rem 2rem; border-radius: 999px;
+            letter-spacing: 4px; margin-bottom: 2.5rem;
+            animation: fadeDown 0.8s ease-out;
+        }
+        .hero h1 {
+            font-size: 4.5rem; font-weight: 900; line-height: 1.25;
+            margin-bottom: 1.8rem;
+            animation: fadeUp 0.8s ease-out 0.2s both;
+        }
+        .hero h1 em {
+            font-style: normal;
+            background: linear-gradient(135deg, var(--cyan), var(--green));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .hero-sub {
+            font-size: 1.45rem; color: var(--sub); max-width: 620px; margin: 0 auto 3.5rem;
+            animation: fadeUp 0.8s ease-out 0.4s both; line-height: 2;
+        }
+        .hero-question {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--card), var(--card2));
+            border: 1px solid rgba(234,179,8,0.2);
+            border-radius: 20px; padding: 1.5rem 3rem;
+            font-size: 1.25rem; font-weight: 700; color: var(--yellow);
+            animation: fadeUp 0.8s ease-out 0.6s both;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.03);
+        }
+        .hero-question span { color: var(--sub); font-weight: 400; font-size: 1.1rem; display: block; margin-top: 0.5rem; }
+        .scroll-cue {
+            position: absolute; bottom: 3rem; left: 50%; transform: translateX(-50%);
+            font-size: 0.95rem; color: #475569;
+            animation: fadeUp 0.8s ease-out 0.8s both;
+        }
+        .scroll-cue i { display: block; font-style: normal; font-size: 2rem; animation: bounce 2s infinite; }
+        @keyframes fadeUp { from{opacity:0;transform:translateY(30px)} to{opacity:1;transform:translateY(0)} }
+        @keyframes fadeDown { from{opacity:0;transform:translateY(-20px)} to{opacity:1;transform:translateY(0)} }
+        @keyframes bounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(10px)} }
+
+        /* ===== COMMON ===== */
+        .container { max-width: 1120px; margin: 0 auto; padding: 7rem 2.5rem; }
+        .label {
+            display: inline-flex; align-items: center; gap: 0.6rem;
+            font-size: 0.95rem; font-weight: 700; letter-spacing: 3px;
+            color: var(--cyan); margin-bottom: 1.2rem;
+        }
+        .label::before { content: ''; width: 32px; height: 2px; background: linear-gradient(90deg, var(--cyan), transparent); }
+        .stitle { font-size: 3rem; font-weight: 900; line-height: 1.35; margin-bottom: 1.2rem; }
+        .sdesc { color: var(--sub); font-size: 1.25rem; max-width: 680px; margin-bottom: 3.5rem; line-height: 2; }
+        .em {
+            background: linear-gradient(135deg,var(--cyan),var(--green));
+            -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+            font-weight:900;
+        }
+        .rv { opacity: 0; transform: translateY(50px); transition: all 0.9s cubic-bezier(0.16,1,0.3,1); }
+        .rv.on { opacity: 1; transform: translateY(0); }
+
+        /* ===== DIVIDER ===== */
+        .sec-divider {
+            text-align: center; padding: 2rem 0; overflow: hidden;
+        }
+        .sec-divider .line {
+            display: inline-block; width: 80px; height: 1px;
+            background: linear-gradient(90deg, transparent, var(--cyan), transparent);
+            vertical-align: middle; margin: 0 1.5rem;
+        }
+        .sec-divider .dot {
+            display: inline-block; width: 8px; height: 8px; border-radius: 50%;
+            background: var(--cyan); vertical-align: middle;
+            box-shadow: 0 0 12px var(--cyan);
+            animation: dotPulse 2s infinite;
+        }
+        @keyframes dotPulse { 0%,100%{box-shadow:0 0 8px var(--cyan)} 50%{box-shadow:0 0 20px var(--cyan)} }
+
+        /* ===== SECTION 1: 핵심 질문 ===== */
+        .question-sec { background: linear-gradient(180deg, var(--bg), var(--bg2)); }
+        .q-box {
+            background: linear-gradient(135deg, var(--card), var(--card2));
+            border: 1px solid var(--border); border-radius: 24px;
+            padding: 3.5rem; margin-bottom: 2.5rem;
+            position: relative; overflow: hidden;
+            transition: all 0.4s;
+        }
+        .q-box:hover {
+            border-color: rgba(6,182,212,0.3);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.3), 0 0 0 1px rgba(6,182,212,0.05);
+            transform: translateY(-4px);
+        }
+        .q-box::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+            background: linear-gradient(90deg, var(--cyan), var(--green), transparent);
+            opacity: 0; transition: opacity 0.4s;
+        }
+        .q-box:hover::before { opacity: 1; }
+        .q-box::after {
+            content: attr(data-num); position: absolute; right: 2.5rem; top: 50%; transform: translateY(-50%);
+            font-size: 9rem; font-weight: 900; color: rgba(255,255,255,0.015);
+            pointer-events: none;
+        }
+        .q-box .q { font-size: 1.55rem; font-weight: 700; color: var(--yellow); margin-bottom: 1.2rem; }
+        .q-box .a { font-size: 1.2rem; color: var(--sub); line-height: 2.1; }
+        .q-box .a strong { color: var(--text); font-weight: 700; }
+
+        /* ===== SECTION 2: 구축 단계 ===== */
+        .build-sec { background: var(--bg2); }
+        .phase-track { position: relative; padding-left: 3.5rem; }
+        .phase-track::before {
+            content: ''; position: absolute; left: 18px; top: 0; bottom: 0; width: 4px;
+            background: linear-gradient(180deg, var(--cyan), var(--green), var(--yellow), var(--orange));
+            border-radius: 4px;
+            box-shadow: 0 0 12px rgba(6,182,212,0.15);
+        }
+        .phase {
+            position: relative; margin-bottom: 3.5rem; padding: 3rem;
+            background: linear-gradient(135deg, var(--card), var(--card2));
+            border: 1px solid var(--border); border-radius: 24px;
+            transition: all 0.4s;
+        }
+        .phase:hover {
+            border-color: rgba(6,182,212,0.3);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3), 0 0 40px rgba(6,182,212,0.04);
+            transform: translateX(8px);
+        }
+        .phase:last-child { margin-bottom: 0; }
+        .phase-dot {
+            position: absolute; left: -47px; top: 3rem;
+            width: 38px; height: 38px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 900; font-size: 0.95rem; color: #000;
+            box-shadow: 0 0 20px rgba(0,0,0,0.3);
+        }
+        .phase-dot.c1 { background: var(--cyan); box-shadow: 0 0 20px rgba(6,182,212,0.3); }
+        .phase-dot.c2 { background: var(--green); box-shadow: 0 0 20px rgba(34,197,94,0.3); }
+        .phase-dot.c3 { background: var(--yellow); box-shadow: 0 0 20px rgba(234,179,8,0.3); }
+        .phase-dot.c4 { background: var(--orange); box-shadow: 0 0 20px rgba(249,115,22,0.3); }
+        .phase-header { display: flex; align-items: center; gap: 1.2rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
+        .phase-badge {
+            font-size: 0.9rem; font-weight: 700; padding: 0.4rem 1.2rem; border-radius: 10px;
+            letter-spacing: 1px;
+        }
+        .phase-badge.c1 { background: rgba(6,182,212,0.12); color: var(--cyan); }
+        .phase-badge.c2 { background: rgba(34,197,94,0.12); color: var(--green); }
+        .phase-badge.c3 { background: rgba(234,179,8,0.12); color: var(--yellow); }
+        .phase-badge.c4 { background: rgba(249,115,22,0.12); color: var(--orange); }
+        .phase h3 { font-size: 1.5rem; font-weight: 700; }
+        .phase-body { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem 2rem; }
+        .phase-item {
+            display: flex; align-items: flex-start; gap: 0.8rem;
+            font-size: 1.12rem; color: var(--sub); line-height: 1.75; padding: 0.5rem 0;
+        }
+        .phase-item .ic { flex-shrink: 0; width: 7px; height: 7px; border-radius: 50%; margin-top: 10px; }
+        .phase:nth-of-type(1) .ic { background: var(--cyan); box-shadow: 0 0 6px var(--cyan); }
+        .phase:nth-of-type(2) .ic { background: var(--green); box-shadow: 0 0 6px var(--green); }
+        .phase:nth-of-type(3) .ic { background: var(--yellow); box-shadow: 0 0 6px var(--yellow); }
+        .phase:nth-of-type(4) .ic { background: var(--orange); box-shadow: 0 0 6px var(--orange); }
+        .phase-item strong { color: var(--text); }
+        .phase-output {
+            margin-top: 1.5rem; padding-top: 1.2rem;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            font-size: 1.05rem; color: var(--cyan); font-weight: 600;
+        }
+
+        /* ===== SECTION 3: 왜 이 팀인가 ===== */
+        .team-sec { background: var(--bg); }
+        .team-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.8rem; }
+        .team-card {
+            background: linear-gradient(135deg, var(--card), var(--card2));
+            border: 1px solid var(--border); border-radius: 24px;
+            padding: 2.8rem; position: relative; overflow: hidden; transition: all 0.4s;
+        }
+        .team-card:hover {
+            border-color: rgba(6,182,212,0.3); transform: translateY(-6px);
+            box-shadow: 0 24px 48px rgba(0,0,0,0.3);
+        }
+        .team-card.main {
+            grid-column: 1 / -1;
+            border-color: rgba(6,182,212,0.25);
+            background: linear-gradient(135deg, #0a2238, #131e33, #0a2238);
+            box-shadow: 0 0 40px rgba(6,182,212,0.05);
+        }
+        .team-card.main::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+            background: linear-gradient(90deg, var(--cyan), var(--green));
+        }
+        .team-role {
+            font-size: 0.9rem; font-weight: 700; letter-spacing: 2px; margin-bottom: 0.8rem;
+        }
+        .team-role.r1 { color: var(--cyan); }
+        .team-role.r2 { color: var(--green); }
+        .team-role.r3 { color: var(--orange); }
+        .team-role.r4 { color: var(--purple); }
+        .team-card h4 { font-size: 1.45rem; margin-bottom: 1rem; }
+        .team-card p { color: var(--sub); font-size: 1.15rem; line-height: 1.9; }
+        .team-stat { display: flex; gap: 2.5rem; margin-top: 1.5rem; flex-wrap: wrap; }
+        .team-stat div { text-align: center; }
+        .team-stat .num { font-size: 2.2rem; font-weight: 900; color: var(--cyan); }
+        .team-stat .lbl { font-size: 0.9rem; color: #64748b; }
+        .team-arrow {
+            display: flex; align-items: center; justify-content: center;
+            padding: 2rem; font-size: 1.25rem; font-weight: 700; color: var(--yellow);
+        }
+        .team-arrow span { font-size: 2.2rem; margin: 0 1rem; animation: arrowPulse 1.5s infinite; }
+        @keyframes arrowPulse { 0%,100%{opacity:0.3;transform:scale(0.95)} 50%{opacity:1;transform:scale(1.1)} }
+        .team-result {
+            background: linear-gradient(135deg, #0d2a1a, #131e33);
+            border: 1px solid rgba(34,197,94,0.3); border-radius: 24px;
+            padding: 3rem; text-align: center;
+            box-shadow: 0 0 40px rgba(34,197,94,0.05);
+        }
+        .team-result h4 { font-size: 1.45rem; color: var(--green); margin-bottom: 0.7rem; line-height: 1.6; }
+        .team-result p { color: var(--sub); font-size: 1.15rem; }
+
+        /* ===== SECTION 4: 조직 구성 ===== */
+        .org-sec { background: var(--bg2); }
+        .org-chart { display: flex; flex-direction: column; align-items: center; gap: 1.8rem; }
+        .org-node {
+            background: linear-gradient(135deg, var(--card), var(--card2));
+            border: 1px solid var(--border); border-radius: 18px;
+            padding: 1.8rem 3.5rem; text-align: center; transition: all 0.3s;
+        }
+        .org-node:hover { transform: scale(1.03); box-shadow: 0 8px 30px rgba(0,0,0,0.3); }
+        .org-node.top {
+            background: linear-gradient(135deg, var(--cyan), var(--green));
+            color: #000; font-weight: 900; font-size: 1.4rem; border: none;
+            box-shadow: 0 8px 30px rgba(6,182,212,0.25);
+            padding: 2rem 4rem;
+        }
+        .org-node .title { font-weight: 700; font-size: 1.2rem; }
+        .org-node .desc { font-size: 1rem; color: var(--sub); margin-top: 0.4rem; line-height: 1.7; }
+        .org-connector { width: 3px; height: 35px; background: linear-gradient(180deg, var(--cyan), #334155); border-radius: 3px; }
+        .org-row { display: flex; gap: 2rem; flex-wrap: wrap; justify-content: center; }
+        .org-teams-row {
+            display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem;
+            width: 100%; max-width: 960px;
+        }
+        .org-team {
+            background: linear-gradient(135deg, var(--card), var(--card2));
+            border: 1px solid var(--border); border-radius: 20px;
+            padding: 2rem 1.5rem; text-align: center; transition: all 0.3s;
+        }
+        .org-team:hover {
+            border-color: rgba(6,182,212,0.3); transform: translateY(-6px);
+            box-shadow: 0 16px 40px rgba(0,0,0,0.3);
+        }
+        .org-team .icon { font-size: 2.8rem; margin-bottom: 1rem; }
+        .org-team h4 { font-size: 1.15rem; margin-bottom: 0.6rem; }
+        .org-team p { font-size: 1rem; color: var(--sub); line-height: 1.8; }
+
+        /* ===== SECTION 5: 5대 연구분야 ===== */
+        .research-sec { background: var(--bg); }
+        .research-ring { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.8rem; }
+        .research-ring .r-card:nth-child(4),
+        .research-ring .r-card:nth-child(5) { grid-column: span 1; }
+        .r-card {
+            background: linear-gradient(135deg, var(--card), var(--card2));
+            border: 1px solid var(--border); border-radius: 24px;
+            padding: 2.8rem; transition: all 0.4s; position: relative; overflow: hidden;
+        }
+        .r-card::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+        }
+        .r-card:nth-child(1)::before { background: linear-gradient(90deg, var(--cyan), transparent); }
+        .r-card:nth-child(2)::before { background: linear-gradient(90deg, var(--green), transparent); }
+        .r-card:nth-child(3)::before { background: linear-gradient(90deg, var(--blue), transparent); }
+        .r-card:nth-child(4)::before { background: linear-gradient(90deg, var(--yellow), transparent); }
+        .r-card:nth-child(5)::before { background: linear-gradient(90deg, var(--purple), transparent); }
+        .r-card:hover {
+            border-color: rgba(6,182,212,0.3); transform: translateY(-8px);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+        }
+        .r-num {
+            font-size: 3.5rem; font-weight: 900; color: rgba(255,255,255,0.03);
+            position: absolute; top: 1rem; right: 1.5rem; pointer-events: none;
+        }
+        .r-card h4 { font-size: 1.3rem; margin-bottom: 1rem; }
+        .r-card p { font-size: 1.1rem; color: var(--sub); line-height: 1.9; }
+        .r-tag {
+            display: inline-block; font-size: 0.88rem; padding: 0.3rem 0.9rem;
+            border-radius: 8px; margin-top: 1rem; font-weight: 600;
+        }
+        .r-tag.t1 { background: rgba(6,182,212,0.1); color: var(--cyan); }
+        .r-tag.t2 { background: rgba(34,197,94,0.1); color: var(--green); }
+        .r-tag.t3 { background: rgba(59,130,246,0.1); color: var(--blue); }
+        .r-tag.t4 { background: rgba(234,179,8,0.1); color: var(--yellow); }
+        .r-tag.t5 { background: rgba(139,92,246,0.1); color: var(--purple); }
+
+        /* ===== SECTION 6: 운영 체계 ===== */
+        .ops-sec { background: var(--bg2); }
+        .ops-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 2rem; }
+        .ops-box {
+            background: linear-gradient(135deg, var(--card), var(--card2));
+            border: 1px solid var(--border); border-radius: 24px;
+            padding: 2.8rem; transition: all 0.4s;
+        }
+        .ops-box:hover { border-color: rgba(6,182,212,0.3); box-shadow: 0 16px 40px rgba(0,0,0,0.3); }
+        .ops-box h4 {
+            font-size: 1.3rem; margin-bottom: 1.2rem;
+            display: flex; align-items: center; gap: 0.7rem;
+        }
+        .ops-box h4 .dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+        .ops-list { list-style: none; }
+        .ops-list li {
+            padding: 0.8rem 0; border-bottom: 1px solid rgba(255,255,255,0.03);
+            font-size: 1.12rem; color: var(--sub); display: flex; align-items: center; gap: 0.8rem;
+            line-height: 1.7;
+        }
+        .ops-list li:last-child { border-bottom: none; }
+        .ops-list .tag {
+            font-size: 0.8rem; font-weight: 700; padding: 0.2rem 0.7rem;
+            border-radius: 6px; flex-shrink: 0; white-space: nowrap;
+        }
+
+        /* ===== SECTION 7: 핵심 메시지 ===== */
+        .msg-sec {
+            background: radial-gradient(ellipse at 50% 50%, rgba(6,182,212,0.06) 0%, transparent 60%),
+                        linear-gradient(135deg, #0c2a3a 0%, #060b18 50%, #0d2a1a 100%);
+        }
+        .msg-box { max-width: 750px; margin: 0 auto; text-align: center; }
+        .msg-box .big {
+            font-size: 2.8rem; font-weight: 900; line-height: 1.55; margin-bottom: 2.5rem;
+        }
+        .msg-box .sub { font-size: 1.25rem; color: var(--sub); line-height: 2.1; }
+        .msg-pills { display: flex; gap: 1.2rem; justify-content: center; flex-wrap: wrap; margin-top: 3rem; }
+        .pill {
+            background: linear-gradient(135deg, var(--card), var(--card2));
+            border: 1px solid var(--border); border-radius: 999px;
+            padding: 1rem 2rem; font-size: 1.1rem; font-weight: 600;
+            transition: all 0.3s;
+        }
+        .pill:hover { border-color: var(--cyan); transform: scale(1.06); box-shadow: 0 8px 24px rgba(0,0,0,0.3); }
+
+        /* ===== BACK TOP ===== */
+        .back-top {
+            position: fixed; bottom: 2.5rem; right: 2.5rem;
+            width: 54px; height: 54px; border-radius: 50%;
+            background: linear-gradient(135deg, var(--cyan), var(--green));
+            color: #000; border: none;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.4rem; font-weight: 900; cursor: pointer; z-index: 998;
+            opacity: 0; transform: translateY(20px); transition: all 0.3s;
+            box-shadow: 0 6px 24px rgba(6,182,212,0.3);
+        }
+        .back-top.show { opacity: 1; transform: translateY(0); }
+        .back-top:hover { transform: translateY(-4px); box-shadow: 0 10px 32px rgba(6,182,212,0.4); }
+
+        /* ===== FOOTER ===== */
+        footer {
+            text-align: center; padding: 4rem 2rem; color: #334155;
+            font-size: 1rem; border-top: 1px solid rgba(30,58,95,0.5); line-height: 2;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            body { font-size: 17px; }
+            .hero h1 { font-size: 2.8rem; }
+            .hero-sub { font-size: 1.2rem; }
+            .hero-question { font-size: 1.1rem; padding: 1.2rem 2rem; }
+            .stitle { font-size: 2.2rem; }
+            .sdesc { font-size: 1.1rem; }
+            .phase-body { grid-template-columns: 1fr; }
+            .phase { padding: 2.5rem 2rem; }
+            .team-grid { grid-template-columns: 1fr; }
+            .team-card.main { grid-column: 1; }
+            .org-teams-row { grid-template-columns: repeat(2, 1fr); }
+            .research-ring { grid-template-columns: 1fr; }
+            .ops-grid { grid-template-columns: 1fr; }
+            .nav-links { display: none; }
+            .container { padding: 5rem 1.5rem; }
+            .q-box { padding: 2.5rem 2rem; }
+            .q-box .q { font-size: 1.3rem; }
+            .q-box .a { font-size: 1.1rem; }
+        }
+        @media (max-width: 480px) {
+            .hero h1 { font-size: 2.2rem; }
+            .stitle { font-size: 1.8rem; }
+            .org-teams-row { grid-template-columns: 1fr; }
+            .container { padding: 4rem 1.2rem; }
+            .msg-box .big { font-size: 2rem; }
+            .team-stat { gap: 1.5rem; }
+            .team-stat .num { font-size: 1.8rem; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Nav -->
+<nav class="nav" id="nav">
+    <div class="nav-logo">R&D CENTER</div>
+    <ul class="nav-links">
+        <li><a href="#q">핵심질문</a></li>
+        <li><a href="#build">구축단계</a></li>
+        <li><a href="#team">컨소시엄</a></li>
+        <li><a href="#org">조직</a></li>
+        <li><a href="#research">연구분야</a></li>
+        <li><a href="#ops">운영</a></li>
+    </ul>
+</nav>
+<div class="progress" id="prog"></div>
+<button class="back-top" id="btt" onclick="window.scrollTo({top:0,behavior:'smooth'})">&#8593;</button>
+
+<!-- ===== HERO ===== -->
+<section class="hero">
+    <div class="hero-grid"></div>
+    <div class="particles" id="particles"></div>
+    <div class="hero-orb" style="width:400px;height:400px;background:var(--cyan);top:10%;left:-10%"></div>
+    <div class="hero-orb" style="width:300px;height:300px;background:var(--green);bottom:15%;right:-5%;animation-delay:3s"></div>
+    <div class="hero-content">
+        <div class="hero-tag">CONSTRUCTION BLUEPRINT</div>
+        <h1><em>R&D 센터</em>를<br>어떻게 구축할 것인가</h1>
+        <p class="hero-sub">전기버스 기반 S-EV 생태계를 위한<br>연구개발 센터 구축의 모든 것</p>
+        <div class="hero-question">
+            "이 컨소시엄이 아니면 이 문제를 못 푼다"
+            <span>그 확신을 주는 구조를 만든다</span>
+        </div>
+    </div>
+    <div class="scroll-cue">아래로<i>&#8964;</i></div>
+</section>
+
+<!-- ===== 1. 핵심 질문 ===== -->
+<div class="question-sec" id="q">
+    <div class="container">
+        <div class="rv">
+            <div class="label">STEP 0</div>
+            <div class="stitle">센터를 만들기 전에<br>먼저 답해야 할 <span class="em">3가지 질문</span></div>
+            <p class="sdesc">장비를 사고 공간을 만드는 것이 구축이 아닙니다.<br>이 질문에 답하는 것이 진짜 구축의 시작입니다.</p>
+        </div>
+
+        <div class="q-box rv" data-num="01" style="transition-delay:0.1s">
+            <div class="q">Q1. 왜 지금 이 센터가 필요한가?</div>
+            <div class="a">
+                전기버스는 <strong>배터리 가격(차량의 40%)</strong>, <strong>긴 충전시간(30분~수시간)</strong>, <strong>부족한 인프라</strong>로 확산이 막혀 있습니다.<br>
+                이건 단일 기술로 풀 수 없는 문제입니다. <strong>차량 + 에너지 + ICT + 서비스</strong>를 동시에 다루는 융합 센터가 필요합니다.<br>
+                EU 2030년 CO2 37.5% 감축, 정부 에너지 신산업 100조원 시장 — <strong>지금 안 하면 늦습니다.</strong>
+            </div>
+        </div>
+
+        <div class="q-box rv" data-num="02" style="transition-delay:0.2s">
+            <div class="q">Q2. 왜 이 팀이어야 하는가?</div>
+            <div class="a">
+                국민대는 <strong>배터리 교체형 전기버스 특허 77건</strong>을 보유하고 <strong>포항 시범사업을 완료</strong>했습니다.<br>
+                참여기업은 <strong>제주도에 실증 인프라(Pilot Plant)</strong>를 갖고 있습니다.<br>
+                <strong>"원천기술 보유 + 실증환경 확보 + 사업화 경험"</strong> — 이 세 가지를 동시에 가진 조합은 이 컨소시엄뿐입니다.
+            </div>
+        </div>
+
+        <div class="q-box rv" data-num="03" style="transition-delay:0.3s">
+            <div class="q">Q3. 센터가 만들어지면 뭐가 달라지는가?</div>
+            <div class="a">
+                <strong>배터리 교체 1분</strong> — 충전 대기 없이 버스 운행이 가능합니다.<br>
+                <strong>V2G 에너지 공유</strong> — 전기버스가 이동하는 발전소가 됩니다.<br>
+                <strong>S-EV 생태계</strong> — 차량-인프라-서비스가 하나로 연결된 새로운 교통 패러다임이 열립니다.
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="sec-divider"><span class="line"></span><span class="dot"></span><span class="line"></span></div>
+
+<!-- ===== 2. 구축 단계 ===== -->
+<div class="build-sec" id="build">
+    <div class="container">
+        <div class="rv">
+            <div class="label">CONSTRUCTION PHASE</div>
+            <div class="stitle">센터 구축, <span class="em">4단계</span>로 진행한다</div>
+            <p class="sdesc">체계 수립 → 기술 연결 → 통합 실증 → 검증 사업화.<br>매년 확실한 산출물이 나옵니다.</p>
+        </div>
+
+        <div class="phase-track">
+            <div class="phase rv" style="transition-delay:0.1s">
+                <div class="phase-dot c1">1</div>
+                <div class="phase-header">
+                    <span class="phase-badge c1">1차년도</span>
+                    <h3>센터 체계 수립 & 연구기반 구축</h3>
+                </div>
+                <div class="phase-body">
+                    <div class="phase-item"><span class="ic"></span><div><strong>거버넌스 확립</strong> — 센터장, 운영위원회, 자문위원회 구성</div></div>
+                    <div class="phase-item"><span class="ic"></span><div><strong>4팀 조직 편성</strong> — R&D, 산학협력, 교육, 행정 각 팀 인력 배치</div></div>
+                    <div class="phase-item"><span class="ic"></span><div><strong>전용 공간 확보</strong> — 센터 연구실 495m&sup2; + 장비실</div></div>
+                    <div class="phase-item"><span class="ic"></span><div><strong>5대 연구분야 확정</strong> — 플랫폼, S/W, 인터랙션, 인프라, 서비스</div></div>
+                    <div class="phase-item"><span class="ic"></span><div><strong>기술 로드맵 수립</strong> — 시장 분석 + 기술 갭 분석 기반</div></div>
+                    <div class="phase-item"><span class="ic"></span><div><strong>컨소시엄 MOU 체결</strong> — 기업별 역할 분담 명확화</div></div>
+                    <div class="phase-item"><span class="ic"></span><div><strong>연구 DB 서버 구축</strong> — 자료관리 시스템 가동</div></div>
+                    <div class="phase-item"><span class="ic"></span><div><strong>사업화 전략 초안</strong> — 실증/시장진출 시나리오 설계</div></div>
+                </div>
+                <div class="phase-output">산출물: 조직체계도 / 기술로드맵 / 컨소시엄 협약서 / 연구기획 보고서</div>
+            </div>
+
+            <div class="phase rv" style="transition-delay:0.15s">
+                <div class="phase-dot c2">2</div>
+                <div class="phase-header">
+                    <span class="phase-badge c2">2차년도</span>
+                    <h3>기술 간 연계 협력 & 검증 체계 확립</h3>
+                </div>
+                <div class="phase-body">
+                    <div class="phase-item"><span class="ic"></span><div><strong>보유 기술 맵핑</strong> — 각 기관 기술 현황 + Gap 분석</div></div>
+                    <div class="phase-item"><span class="ic"></span><div><strong>융합 프레임워크</strong> — 초학제적 연계 방법론 정립</div></div>
+                    <div class="phase-item"><span class="ic"></span><div><strong>핵심기술 개발 착수</strong> — 5개 분야별 요소기술 연구</div></div>
+                    <div class="phase-item"><span class="ic"></span><div><strong>KPI 수립</strong> — 배터리 교체 시간, 충전 효율 등 정량 기준</div></div>
+                    <div class="phase-item"><span class="ic"></span><div><strong>시뮬레이션 환경</strong> — 기술 사전 검증 체계 구축</div></div>
+                    <div class="phase-item"><span class="ic"></span><div><strong>실증 후보지 확정</strong> — 제주도 Pilot Plant 연계 시나리오</div></div>
+                    <div class="phase-item"><span class="ic"></span><div><strong>사업화 추진조직</strong> — 서비스/인프라 사업화팀 구성</div></div>
+                    <div class="phase-item"><span class="ic"></span><div><strong>인력양성 프로그램</strong> — 석·박사 융합과정 개설</div></div>
+                </div>
+                <div class="phase-output">산출물: 기술 Gap 분석서 / KPI 지표 / 시뮬레이션 결과 / 실증 시나리오</div>
+            </div>
+
+            <div class="phase rv" style="transition-delay:0.2s">
+                <div class="phase-dot c3">3</div>
+                <div class="phase-header">
+                    <span class="phase-badge c3">3차년도</span>
+                    <h3>기술 통합 & 실증 인프라 구축</h3>
+                </div>
+                <div class="phase-body">
+                    <div class="phase-item"><span class="ic"></span><div><strong>S-EV 프로토타입</strong> — 배터리교체형 전기버스 시작품 개발</div></div>
+                    <div class="phase-item"><span class="ic"></span><div><strong>V2G/B2G 기술</strong> — 에너지 공유 핵심 모듈 개발</div></div>
+                    <div class="phase-item"><span class="ic"></span><div><strong>IoT 스마트주행</strong> — 관제/네트워크/도로 기술 개발</div></div>
+                    <div class="phase-item"><span class="ic"></span><div><strong>S/W 아키텍처</strong> — AUTOSAR + Android 이중 지원 구현</div></div>
+                    <div class="phase-item"><span class="ic"></span><div><strong>테스트베드 구축</strong> — 제주 인프라 설치 + 운영 시작</div></div>
+                    <div class="phase-item"><span class="ic"></span><div><strong>안전인증 수행</strong> — 차량/인프라/서비스 인증 절차</div></div>
+                    <div class="phase-item"><span class="ic"></span><div><strong>기관 협의</strong> — 교통연구원, 에너지관리공단 공동사업</div></div>
+                    <div class="phase-item"><span class="ic"></span><div><strong>사용자 테스트</strong> — 운전기사/승객 피드백 수집</div></div>
+                </div>
+                <div class="phase-output">산출물: S-EV 프로토타입 / 테스트베드 운영 보고서 / 안전인증서</div>
+            </div>
+
+            <div class="phase rv" style="transition-delay:0.25s">
+                <div class="phase-dot c4">4</div>
+                <div class="phase-header">
+                    <span class="phase-badge c4">4차년도</span>
+                    <h3>성능 검증 & 경제성 분석 & 사업화</h3>
+                </div>
+                <div class="phase-body">
+                    <div class="phase-item"><span class="ic"></span><div><strong>성능 실증 완료</strong> — 배터리 교체 1분 이내 등 KPI 검증</div></div>
+                    <div class="phase-item"><span class="ic"></span><div><strong>온실가스 절감</strong> — CO2 감축량 실측 데이터 산출</div></div>
+                    <div class="phase-item"><span class="ic"></span><div><strong>TCO 비교 분석</strong> — 디젤 vs 전기버스 총비용 비교</div></div>
+                    <div class="phase-item"><span class="ic"></span><div><strong>비즈니스 모델</strong> — 수익모델 개발 + 경제성 검증</div></div>
+                    <div class="phase-item"><span class="ic"></span><div><strong>표준화 추진</strong> — S-EV 인증체계 + 법제도 개선안</div></div>
+                    <div class="phase-item"><span class="ic"></span><div><strong>범부처 협력</strong> — 정부/지자체 확산 사업 기획</div></div>
+                    <div class="phase-item"><span class="ic"></span><div><strong>세계시장 진출</strong> — 해외 전기버스 시장 진출 기반</div></div>
+                    <div class="phase-item"><span class="ic"></span><div><strong>자립화 전환</strong> — 정부 지원 종료 후 자립 계획 가동</div></div>
+                </div>
+                <div class="phase-output">산출물: 성능검증 보고서 / 경제성 분석서 / 비즈니스 모델 / 표준화 문서</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="sec-divider"><span class="line"></span><span class="dot"></span><span class="line"></span></div>
+
+<!-- ===== 3. 왜 이 팀인가 ===== -->
+<div class="team-sec" id="team">
+    <div class="container">
+        <div class="rv">
+            <div class="label">CONSORTIUM</div>
+            <div class="stitle">왜 <span class="em">이 팀</span>이어야 하는가</div>
+            <p class="sdesc">"기술개발 → 실증 → 사업화"를 한 번에 할 수 있는<br>유일한 조합입니다.</p>
+        </div>
+
+        <div class="team-grid rv">
+            <div class="team-card main">
+                <div class="team-role r1">주관기관 — 원천기술</div>
+                <h4>국민대학교</h4>
+                <p>V2G 플랫폼 원천기술 보유. 배터리 교체형 전기버스 핵심 특허 확보. 포항 시범사업 완료로 기술 실현 가능성 입증. 14인 핵심연구원 + 석·박사 양성 체계.</p>
+                <div class="team-stat">
+                    <div><div class="num" data-count="89">0</div><div class="lbl">특허 출원</div></div>
+                    <div><div class="num" data-count="85">0</div><div class="lbl">특허 등록</div></div>
+                    <div><div class="num" data-count="77">0</div><div class="lbl">S-EV 관련</div></div>
+                    <div><div class="num" data-count="6">0</div><div class="lbl">기술이전</div></div>
+                </div>
+            </div>
+            <div class="team-card rv" style="transition-delay:0.1s">
+                <div class="team-role r2">참여기업 — 실증인프라</div>
+                <h4>완성차 / 인프라 기업</h4>
+                <p>제주도 배터리 교체형 전기버스 Pilot Plant 보유. 배터리 교체 스테이션 + 통합관제센터 운영 경험. 전기버스 실차 보유.</p>
+            </div>
+            <div class="team-card rv" style="transition-delay:0.15s">
+                <div class="team-role r3">참여기업 — 에너지</div>
+                <h4>에너지 / 전력 기업</h4>
+                <p>충전 인프라 기술 보유. V2G / ESS 연동 기술. 신재생에너지 기반 에너지 공유 시스템 구축 역량.</p>
+            </div>
+            <div class="team-card rv" style="transition-delay:0.2s">
+                <div class="team-role r4">참여기업 — ICT</div>
+                <h4>ICT / 서비스 기업</h4>
+                <p>S/W 플랫폼 개발 역량. IoT/ICT 융합 기술. 서비스 기획 및 사업화 경험.</p>
+            </div>
+        </div>
+
+        <div class="team-arrow rv" style="transition-delay:0.25s">
+            원천기술 <span>+</span> 실증환경 <span>+</span> 사업화 역량 <span>=</span>
+        </div>
+
+        <div class="team-result rv" style="transition-delay:0.3s">
+            <h4>"이 조합이 아니면 기술개발 → 실증 → 사업화를<br>한 번에 못 한다"</h4>
+            <p>이것이 빌드업의 핵심이자, 센터 구축의 정당성입니다</p>
+        </div>
+    </div>
+</div>
+
+<div class="sec-divider"><span class="line"></span><span class="dot"></span><span class="line"></span></div>
+
+<!-- ===== 4. 조직 구성 ===== -->
+<div class="org-sec" id="org">
+    <div class="container">
+        <div class="rv">
+            <div class="label">ORGANIZATION</div>
+            <div class="stitle">센터 <span class="em">조직 구성</span></div>
+            <p class="sdesc">센터장 아래 2개 위원회 + 4개 실행팀.<br>의사결정과 실행이 분리된 구조입니다.</p>
+        </div>
+
+        <div class="org-chart rv">
+            <div class="org-node top">센터장 (주관연구책임자)</div>
+            <div class="org-connector"></div>
+            <div class="org-row">
+                <div class="org-node" style="border-color:rgba(234,179,8,0.3);">
+                    <div class="title" style="color:var(--yellow);">운영위원회</div>
+                    <div class="desc">추진사항 조율 + 최종 의사결정<br>센터장 + 핵심연구원으로 구성</div>
+                </div>
+                <div class="org-node" style="border-color:rgba(139,92,246,0.3);">
+                    <div class="title" style="color:var(--purple);">자문위원회</div>
+                    <div class="desc">외부 전문가 10명<br>연구계획 타당성 + 실적 평가 + 자문</div>
+                </div>
+            </div>
+            <div class="org-connector"></div>
+            <div class="org-teams-row">
+                <div class="org-team">
+                    <div class="icon">&#128300;</div>
+                    <h4>R&D 혁신팀</h4>
+                    <p>산학연 기술교류<br>연구성과 지표관리<br>시제품 개발</p>
+                </div>
+                <div class="org-team">
+                    <div class="icon">&#129309;</div>
+                    <h4>산학협력팀</h4>
+                    <p>산학연 네트워크<br>기술세미나 개최<br>참여기업 유치</p>
+                </div>
+                <div class="org-team">
+                    <div class="icon">&#127891;</div>
+                    <h4>교육선진화팀</h4>
+                    <p>인력양성 / 인턴십<br>전문인력 선발<br>교육 질 관리</p>
+                </div>
+                <div class="org-team">
+                    <div class="icon">&#128203;</div>
+                    <h4>행정지원팀</h4>
+                    <p>예산 집행<br>전시회 / 공모전<br>행정 지원 전반</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="sec-divider"><span class="line"></span><span class="dot"></span><span class="line"></span></div>
+
+<!-- ===== 5. 5대 연구분야 ===== -->
+<div class="research-sec" id="research">
+    <div class="container">
+        <div class="rv">
+            <div class="label">5 CORE AREAS</div>
+            <div class="stitle">센터가 집중하는 <span class="em">5대 연구분야</span></div>
+            <p class="sdesc">이 5개 분야가 하나로 합쳐져야<br>S-EV 생태계가 완성됩니다.</p>
+        </div>
+        <div class="research-ring">
+            <div class="r-card rv" style="transition-delay:0.1s">
+                <div class="r-num">01</div>
+                <h4>S-EV 플랫폼</h4>
+                <p>GPS, 센서, 통신이 집적된 MSLeV 차량 플랫폼. 정보수집 → 연계 → 제어 기술이 통합된 S-EV 생태계의 핵심.</p>
+                <div class="r-tag t1">차량 하드웨어</div>
+            </div>
+            <div class="r-card rv" style="transition-delay:0.15s">
+                <div class="r-num">02</div>
+                <h4>S-EV S/W 아키텍처</h4>
+                <p>사용자용 Android + 차량용 AUTOSAR 동시 지원. 부가기능 확장에 유연한 이중 구조 소프트웨어.</p>
+                <div class="r-tag t2">소프트웨어</div>
+            </div>
+            <div class="r-card rv" style="transition-delay:0.2s">
+                <div class="r-num">03</div>
+                <h4>S-EV User 인터랙션</h4>
+                <p>차량-사용자-환경 간 교감 기반 인터랙션. 운전자 지원, 모바일 스마트 인터랙션, 정보 시각화.</p>
+                <div class="r-tag t3">사용자 경험</div>
+            </div>
+            <div class="r-card rv" style="transition-delay:0.25s">
+                <div class="r-num">04</div>
+                <h4>S-EV 인프라</h4>
+                <p>배터리 충전/교체 스테이션. 무선충전. MSLeV 관제/네트워크/도로 기술. 스마트 주행 지원.</p>
+                <div class="r-tag t4">충전 인프라</div>
+            </div>
+            <div class="r-card rv" style="transition-delay:0.3s">
+                <div class="r-num">05</div>
+                <h4>S-EV 서비스</h4>
+                <p>V2G 에너지 공유, 스마트주행, 교통수요관리, 무인이송 등 S-EV 생태계를 구성하는 서비스 전체.</p>
+                <div class="r-tag t5">서비스 / 사업화</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="sec-divider"><span class="line"></span><span class="dot"></span><span class="line"></span></div>
+
+<!-- ===== 6. 운영 체계 ===== -->
+<div class="ops-sec" id="ops">
+    <div class="container">
+        <div class="rv">
+            <div class="label">OPERATIONS</div>
+            <div class="stitle">센터는 이렇게 <span class="em">운영</span>한다</div>
+            <p class="sdesc">만드는 것보다 굴리는 것이 더 중요합니다.<br>구체적인 운영 방식입니다.</p>
+        </div>
+
+        <div class="ops-grid">
+            <div class="ops-box rv" style="transition-delay:0.1s">
+                <h4><span class="dot" style="background:var(--cyan);box-shadow:0 0 8px var(--cyan)"></span>의사결정 구조</h4>
+                <ul class="ops-list">
+                    <li><span class="tag" style="background:rgba(6,182,212,0.12);color:var(--cyan)">일반</span>자문위원회 자문 → 운영위원회 결정</li>
+                    <li><span class="tag" style="background:rgba(234,179,8,0.12);color:var(--yellow)">중요</span>예산변경, 인력교체 → 핵심연구원 회의 → 운영위 의결</li>
+                    <li><span class="tag" style="background:rgba(239,68,68,0.12);color:var(--red)">평가</span>4개 팀 운영보고서 → 평가위원회 → 운영위 의결</li>
+                </ul>
+            </div>
+            <div class="ops-box rv" style="transition-delay:0.15s">
+                <h4><span class="dot" style="background:var(--green);box-shadow:0 0 8px var(--green)"></span>정기 활동</h4>
+                <ul class="ops-list">
+                    <li><span class="tag" style="background:rgba(34,197,94,0.12);color:var(--green)">2개월</span>실적보고 — 자체평가 확인/점검</li>
+                    <li><span class="tag" style="background:rgba(34,197,94,0.12);color:var(--green)">분기</span>기술교류회 — 최신 동향/선도기술 공유</li>
+                    <li><span class="tag" style="background:rgba(34,197,94,0.12);color:var(--green)">반기</span>센터 워크숍 — 성과점검/기관연계</li>
+                    <li><span class="tag" style="background:rgba(34,197,94,0.12);color:var(--green)">연간</span>자체평가 — 정성/정량 평가 → 포상/경고/반영</li>
+                </ul>
+            </div>
+            <div class="ops-box rv" style="transition-delay:0.2s">
+                <h4><span class="dot" style="background:var(--yellow);box-shadow:0 0 8px var(--yellow)"></span>5대 평가 항목</h4>
+                <ul class="ops-list">
+                    <li><span class="tag" style="background:rgba(234,179,8,0.12);color:var(--yellow)">연구</span>논문 게재, 특허 출원/등록, 기술이전</li>
+                    <li><span class="tag" style="background:rgba(234,179,8,0.12);color:var(--yellow)">산학</span>기업 기술지원, 협력과제 도출</li>
+                    <li><span class="tag" style="background:rgba(234,179,8,0.12);color:var(--yellow)">국제</span>국제 공동과제, 인력 교류</li>
+                    <li><span class="tag" style="background:rgba(234,179,8,0.12);color:var(--yellow)">홍보</span>홈페이지, 심포지엄, 소식지</li>
+                    <li><span class="tag" style="background:rgba(234,179,8,0.12);color:var(--yellow)">교육</span>인력양성, 전문가 양성, 교육세미나</li>
+                </ul>
+            </div>
+            <div class="ops-box rv" style="transition-delay:0.25s">
+                <h4><span class="dot" style="background:var(--purple);box-shadow:0 0 8px var(--purple)"></span>연구 전략</h4>
+                <ul class="ops-list">
+                    <li><span class="tag" style="background:rgba(139,92,246,0.12);color:var(--purple)">방법</span>Tech Push + Demand Pull 병행</li>
+                    <li><span class="tag" style="background:rgba(139,92,246,0.12);color:var(--purple)">관점</span>기술 중심이 아닌 사용자/사회 현상 고려</li>
+                    <li><span class="tag" style="background:rgba(139,92,246,0.12);color:var(--purple)">연계</span>산-학-연 인력 수요 반영, 수요지향 인력양성</li>
+                    <li><span class="tag" style="background:rgba(139,92,246,0.12);color:var(--purple)">지원</span>참여기업 기술한계 극복 분석지원 + 기술지도</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ===== 7. 핵심 메시지 ===== -->
+<div class="msg-sec">
+    <div class="container">
+        <div class="msg-box rv">
+            <div class="big">
+                센터 구축의 핵심은<br>
+                <span class="em">장비가 아니라 체계</span>이고<br>
+                <span class="em">기술이 아니라 스토리</span>입니다
+            </div>
+            <div class="sub">
+                "이 팀이 아니면 이 문제를 못 푼다"는 확신을 주는 구조.<br>
+                매년 확실한 산출물이 나오는 단계적 접근.<br>
+                기술을 뼈대로, 스토리를 살로 입히는 것.<br>
+                그것이 R&D 센터 구축의 본질입니다.
+            </div>
+            <div class="msg-pills">
+                <div class="pill">빌드업 = 왜 우리인가</div>
+                <div class="pill">체계 = 어떻게 굴리는가</div>
+                <div class="pill">로드맵 = 매년 뭐가 나오는가</div>
+                <div class="pill">스토리 = 왜 지금인가</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer>
+    ERC(2016) / CRC(2015) 선도연구센터지원사업 제안서 기반 종합 정리<br>
+    R&D 센터 구축 방안 | 2026-02-16
+</footer>
+
+<script>
+// Particles
+const pEl = document.getElementById('particles');
+if (pEl) {
+    const colors = ['#06b6d4','#22c55e','#3b82f6','#8b5cf6','#eab308'];
+    for (let i = 0; i < 35; i++) {
+        const d = document.createElement('div');
+        d.className = 'particle';
+        d.style.left = Math.random()*100+'%';
+        d.style.animationDelay = Math.random()*7+'s';
+        d.style.animationDuration = (5+Math.random()*6)+'s';
+        d.style.background = colors[Math.floor(Math.random()*colors.length)];
+        const s = (2+Math.random()*4)+'px';
+        d.style.width = s; d.style.height = s;
+        d.style.boxShadow = '0 0 '+(4+Math.random()*8)+'px '+d.style.background;
+        pEl.appendChild(d);
+    }
+}
+
+// Scroll handler
+let tk = false;
+window.addEventListener('scroll', () => {
+    if (!tk) {
+        requestAnimationFrame(() => {
+            const s = window.scrollY;
+            const h = document.documentElement.scrollHeight - window.innerHeight;
+            document.getElementById('prog').style.width = (s/h*100)+'%';
+            document.getElementById('nav').classList.toggle('show', s > 500);
+            document.getElementById('btt').classList.toggle('show', s > 700);
+            tk = false;
+        });
+        tk = true;
+    }
+});
+
+// Reveal
+const obs = new IntersectionObserver(es => {
+    es.forEach(e => { if (e.isIntersecting) e.target.classList.add('on'); });
+}, { threshold: 0.08, rootMargin: '0px 0px -20px 0px' });
+document.querySelectorAll('.rv').forEach(el => obs.observe(el));
+
+// Counter animation
+const cObs = new IntersectionObserver(es => {
+    es.forEach(e => {
+        if (e.isIntersecting) {
+            const el = e.target;
+            const target = parseInt(el.dataset.count);
+            let cur = 0;
+            const step = Math.max(1, target / 60);
+            const timer = setInterval(() => {
+                cur += step;
+                if (cur >= target) { cur = target; clearInterval(timer); }
+                el.textContent = Math.floor(cur);
+            }, 20);
+            cObs.unobserve(el);
+        }
+    });
+}, { threshold: 0.5 });
+document.querySelectorAll('[data-count]').forEach(el => cObs.observe(el));
+
+// Nav smooth scroll
+document.querySelectorAll('.nav-links a').forEach(a => {
+    a.addEventListener('click', e => {
+        e.preventDefault();
+        document.querySelector(a.getAttribute('href')).scrollIntoView({ behavior: 'smooth' });
+    });
+});
+</script>
+</body>
+</html>
