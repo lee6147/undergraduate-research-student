@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="https://capsule-render.vercel.app/api?type=waving&color=0:6366f1,100:38bdf8&height=250&section=header&text=Obsidian%20%C3%97%20React%20HTML&fontSize=42&fontColor=ffffff&animation=fadeIn&fontAlignY=35&desc=Obsidian%EC%97%90%EC%84%9C%20React%20HTML%20%EC%95%B1%EC%9D%84%20%EC%8B%A4%ED%96%89%ED%95%98%EB%8A%94%20%ED%94%84%EB%A1%AC%ED%94%84%ED%8A%B8%20%26%20%EA%B0%80%EC%9D%B4%EB%93%9C&descSize=16&descAlignY=55" width="100%" />
+<img src="./assets/header.svg" width="100%" />
 
 <br/>
 
@@ -543,7 +543,7 @@ style: height: 800px; width: 100%; overflow: hidden;
 
 <div align="center">
 
-<img src="https://capsule-render.vercel.app/api?type=waving&color=0:6366f1,100:38bdf8&height=120&section=footer" width="100%" />
+<img src="./assets/footer.svg" width="100%" />
 
 **Obsidian + Custom Frames + Claude**
 
