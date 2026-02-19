@@ -1,4 +1,4 @@
-# Obsidian HTML/React 통합 가이드 v3
+# Obsidian HTML/React Prompt
 
 > JSX/TSX 파일을 Obsidian에서 실행 가능한 HTML로 변환하고 삽입하는 전체 워크플로우 문서입니다.
 > 환경 구성 → 변환 → 삽입까지 하나의 문서에서 다룹니다.
