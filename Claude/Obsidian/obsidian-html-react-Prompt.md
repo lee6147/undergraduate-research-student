@@ -1,4 +1,4 @@
-# JSX → Obsidian HTML 변환 프롬프트 (Compact v4.3)
+# JSX → Obsidian HTML 변환 프롬프트 (Compact 최종본)
 
 > 아래 전체를 AI 대화 첫 메시지에 붙여넣고, JSX/TSX 파일을 첨부하거나 요청하세요.
 > 상세 레퍼런스: `JSX_Obsidian_통합지침서_v4.3.md`
