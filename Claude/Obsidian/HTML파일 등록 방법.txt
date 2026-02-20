@@ -1,0 +1,38 @@
+## Obsidian에서 HTML 파일 보는 방법
+
+### 왜 등록이 필요한가요?
+Obsidian은 마크다운 에디터이기 때문에 HTML/JavaScript를 직접 실행할 수 없습니다.
+Custom Frames 플러그인을 사용하면 Obsidian 안에서 HTML 파일을 열 수 있지만,
+파일마다 data.json에 등록 + Obsidian 재시작이 필요합니다.
+
+이 과정을 register_html.py 스크립트가 자동으로 처리합니다.
+
+### 용어
+- Vault: Obsidian이 관리하는 작업 폴더입니다. 폴더 안에 .obsidian 숨김 폴더가 있으면 그곳이 Vault입니다.
+
+### 사전 준비
+- Custom Frames 플러그인이 설치되어 있어야 합니다 (https://github.com/lishid/obsidian-custom-frames)
+- Python 3이 설치되어 있어야 합니다
+
+### 등록 방법
+
+1. HTML 파일을 Vault 내 html/ 폴더에 넣습니다
+2. 아래 중 하나를 실행합니다
+
+   A. Claude Code 사용 시
+      "html 폴더에 새 파일 넣었어, 등록해줘"
+
+   B. 직접 실행 시
+      python register_html.py
+
+3. Obsidian이 자동 재시작되며 사이드바에 새 아이콘이 나타납니다
+
+### 스크립트가 하는 일
+- html/ 폴더의 *.html 파일을 스캔합니다
+- HTML의 <title> 태그에서 표시 이름을 추출합니다
+- Custom Frames data.json에 자동 등록합니다
+- Obsidian을 재시작합니다
+
+### 참고
+- register_html.py와 html/ 폴더는 Vault 루트(.obsidian이 있는 폴더)에 있어야 합니다
+- 경로는 각자 환경에 따라 다르지만, 스크립트가 자신의 위치를 기준으로 자동 인식합니다

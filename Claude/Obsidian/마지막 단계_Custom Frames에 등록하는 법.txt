@@ -1,0 +1,7 @@
+  HTML 파일 Custom Frames에 등록하는 법:
+
+  1. 파일을 html/ 폴더에 넣으세요(원하는 폴더에 넣기!)
+  C:\Users\user\Desktop\Claud\Git\Undergraduate-research-student\Claude\Obsidian\html\
+  2. Claude Code에 말씀하세요:
+  html 폴더에 새 파일 넣었어, 등록해줘
+  3. 끝입니다.
