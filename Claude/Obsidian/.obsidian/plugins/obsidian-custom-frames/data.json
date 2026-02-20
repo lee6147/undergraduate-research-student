@@ -47,6 +47,30 @@
             "forceIframe": false,
             "customCss": "body { overflow-x: hidden; }",
             "customJs": ""
+        },
+        {
+            "url": "file:///C:/Users/user/Desktop/Claud/Obsidian/obsidian_guide.html",
+            "displayName": "Obsidian Guide",
+            "icon": "book",
+            "hideOnMobile": true,
+            "addRibbonIcon": true,
+            "openInCenter": true,
+            "zoomLevel": 1,
+            "forceIframe": false,
+            "customCss": "body { overflow-x: hidden; }",
+            "customJs": ""
+        },
+        {
+            "url": "file:///C:/Users/user/Desktop/Claud/Git/Undergraduate-research-student/Claude/Obsidian/html/git_guide.html",
+            "displayName": "Git 완전 정복 가이드",
+            "icon": "git-branch",
+            "hideOnMobile": true,
+            "addRibbonIcon": true,
+            "openInCenter": true,
+            "zoomLevel": 1,
+            "forceIframe": false,
+            "customCss": "body { overflow-x: hidden; }",
+            "customJs": "auto-registered"
         }
     ],
     "padding": 0

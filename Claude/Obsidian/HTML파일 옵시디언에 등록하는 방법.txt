@@ -1,0 +1,7 @@
+● 1. HTML 파일을 html/ 폴더에 넣기
+  C:\Users\user\Desktop\Claud\Git\Undergraduate-research-student\Claude\Obsidian\html\
+  2. 감시 모드가 켜져 있으면 → 약 5초 후 Obsidian 자동 재시작. 끝.
+
+  2. 감시 모드가 꺼져 있으면 → 터미널에서:
+  python register_html.py
+  3. Obsidian 사이드바에 새 아이콘 클릭해서 열기
